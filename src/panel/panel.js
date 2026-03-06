@@ -19,7 +19,7 @@
   const existing = document.getElementById(HOST_ID);
   if (existing) {
     const hidden = existing.style.display === 'none';
-    existing.style.display = hidden ? 'block' : 'none';
+    existing.style.setProperty('display', hidden ? 'block' : 'none', 'important');
     if (hidden) {
       const input = existing.shadowRoot?.querySelector('.nk-input');
       if (input) {
@@ -90,7 +90,7 @@
   }
 
   function closePanel() {
-    host.style.display = 'none';
+    host.style.setProperty('display', 'none', 'important');
     results = [];
     activeIdx = -1;
     resultsList.innerHTML = '';
@@ -172,14 +172,17 @@
     closePanel();
   }
 
+  function handleEscape(e) {
+    if (e.key !== 'Escape') return;
+    if (!host.isConnected || host.style.display === 'none') return;
+    e.preventDefault();
+    e.stopPropagation();
+    closePanel();
+  }
+
   /* ── Keyboard navigation ─────────────────────────────────────────── */
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopPropagation();
-      closePanel();
-      return;
-    }
+    if (e.key === 'Escape') return handleEscape(e);
 
     if (!results.length) return;
 
@@ -216,11 +219,6 @@
   });
 
   /* ── Close on Escape anywhere on the page ─────────────────────── */
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && host.style.display !== 'none') {
-      e.preventDefault();
-      e.stopPropagation();
-      closePanel();
-    }
-  }, true);
+  window.addEventListener('keydown', handleEscape, true);
+  document.addEventListener('keydown', handleEscape, true);
 })();
