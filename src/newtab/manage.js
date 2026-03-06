@@ -55,14 +55,24 @@ async function render() {
       <span class="card-header-icon">⚡</span>
       <span class="card-header-title">Shortcuts</span>
     </div>
-    <div class="card-links">
+    <div class="card-items">
       ${shortcuts.map(sc => `
-        <div class="link-row shortcut-row" data-id="${sc.id}">
-          <input type="text" class="input-sm kw-input" value="${escapeAttr(sc.keyword)}"
-            data-field="keyword" placeholder="keyword">
-          <input type="text" class="input-sm link-url-input" value="${escapeAttr(sc.urlTemplate)}"
-            data-field="urlTemplate" placeholder="https://...?q=%s">
-          <button class="btn-icon" data-action="delete-shortcut" title="Delete">✕</button>
+        <div class="item-entry" data-id="${sc.id}" data-type="shortcut">
+          <div class="item-title" data-action="toggle-expand">
+            <span class="item-label">${escapeAttr(sc.keyword) || '<em>untitled</em>'}</span>
+            <span class="item-chevron">›</span>
+          </div>
+          <div class="item-detail">
+            <div class="detail-row shortcut-row" data-id="${sc.id}">
+              <input type="text" class="input-sm" value="${escapeAttr(sc.keyword)}"
+                data-field="keyword" placeholder="keyword">
+              <textarea class="input-sm url-textarea" data-field="urlTemplate"
+                placeholder="https://...?q=%s" rows="2">${escapeAttr(sc.urlTemplate)}</textarea>
+              <div class="delete-btn-row">
+                <button class="btn-icon" data-action="delete-shortcut" title="Delete">✕</button>
+              </div>
+            </div>
+          </div>
         </div>
       `).join('')}
       ${shortcuts.length === 0 ? '<p class="empty-text">No shortcuts yet</p>' : ''}
@@ -81,14 +91,24 @@ async function render() {
           data-action="rename-group" data-group-id="${group.id}" placeholder="Group name">
         <button class="btn-icon" data-action="delete-group" data-group-id="${group.id}" title="Delete group">✕</button>
       </div>
-      <div class="card-links">
+      <div class="card-items">
         ${links.map(l => `
-          <div class="link-row" data-id="${l.id}" data-group-id="${group.id}">
-            <input type="text" class="input-sm link-title-input" value="${escapeAttr(l.title)}"
-              data-field="title" placeholder="Title">
-            <input type="text" class="input-sm link-url-input" value="${escapeAttr(l.url)}"
-              data-field="url" placeholder="https://…">
-            <button class="btn-icon" data-action="delete-link" title="Delete">✕</button>
+          <div class="item-entry" data-id="${l.id}" data-group-id="${group.id}" data-type="link">
+            <div class="item-title" data-action="toggle-expand">
+              <span class="item-label">${escapeAttr(l.title) || '<em>untitled</em>'}</span>
+              <span class="item-chevron">›</span>
+            </div>
+            <div class="item-detail">
+              <div class="detail-row link-row" data-id="${l.id}" data-group-id="${group.id}">
+                <input type="text" class="input-sm" value="${escapeAttr(l.title)}"
+                  data-field="title" placeholder="Title">
+                <textarea class="input-sm url-textarea" data-field="url"
+                  placeholder="https://…" rows="2">${escapeAttr(l.url)}</textarea>
+                <div class="delete-btn-row">
+                  <button class="btn-icon" data-action="delete-link" title="Delete">✕</button>
+                </div>
+              </div>
+            </div>
           </div>
         `).join('')}
         ${links.length === 0 ? '<p class="empty-text">No links yet</p>' : ''}
@@ -110,6 +130,14 @@ async function render() {
 /* ------------------------------------------------------------------ */
 
 function bindEvents() {
+  // Toggle expand/collapse
+  masonry.querySelectorAll('[data-action="toggle-expand"]').forEach(titleEl => {
+    titleEl.addEventListener('click', () => {
+      const entry = titleEl.closest('.item-entry');
+      entry.classList.toggle('expanded');
+    });
+  });
+
   // Group name rename
   masonry.querySelectorAll('[data-action="rename-group"]').forEach(input => {
     input.addEventListener('change', async () => {
@@ -141,38 +169,47 @@ function bindEvents() {
       const links = await db.getByIndex(db.STORES.LINKS, 'groupId', groupId);
       await db.add(db.STORES.LINKS, { groupId, title: '', url: '', order: links.length });
       await render();
+      // Auto-expand and focus the newly added entry
       const card = masonry.querySelector(`[data-type="group"][data-group-id="${groupId}"]`);
       if (card) {
-        const rows = card.querySelectorAll('.link-row');
-        if (rows.length) rows[rows.length - 1].querySelector('.link-title-input')?.focus();
+        const entries = card.querySelectorAll('.item-entry');
+        if (entries.length) {
+          const last = entries[entries.length - 1];
+          last.classList.add('expanded');
+          last.querySelector('[data-field="title"]')?.focus();
+        }
       }
     });
   });
 
-  // Link field changes
-  masonry.querySelectorAll('.link-row[data-group-id] input').forEach(input => {
+  // Link field changes (also update the collapsed label)
+  masonry.querySelectorAll('.link-row[data-group-id] input, .link-row[data-group-id] textarea').forEach(input => {
     input.addEventListener('change', async () => {
-      const row = input.closest('.link-row');
+      const row = input.closest('.detail-row');
       const id = Number(row.dataset.id);
       const groupId = Number(row.dataset.groupId);
       const title = row.querySelector('[data-field="title"]').value.trim();
       const url = row.querySelector('[data-field="url"]').value.trim();
       await db.update(db.STORES.LINKS, { id, groupId, title, url });
+      // Update collapsed label
+      const entry = row.closest('.item-entry');
+      const label = entry.querySelector('.item-label');
+      label.textContent = title || 'untitled';
     });
   });
 
   // Delete link
   masonry.querySelectorAll('[data-action="delete-link"]').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const row = btn.closest('.link-row');
+      const row = btn.closest('.detail-row');
       const id = Number(row.dataset.id);
       await db.remove(db.STORES.LINKS, id);
       await render();
     });
   });
 
-  // Shortcut field changes
-  masonry.querySelectorAll('.shortcut-row input').forEach(input => {
+  // Shortcut field changes (also update collapsed label)
+  masonry.querySelectorAll('.shortcut-row input, .shortcut-row textarea').forEach(input => {
     input.addEventListener('change', async () => {
       const row = input.closest('.shortcut-row');
       const id = Number(row.dataset.id);
@@ -181,6 +218,10 @@ function bindEvents() {
       if (keyword || urlTemplate) {
         await db.update(db.STORES.SHORTCUTS, { id, keyword, urlTemplate });
       }
+      // Update collapsed label
+      const entry = row.closest('.item-entry');
+      const label = entry.querySelector('.item-label');
+      label.textContent = keyword || 'untitled';
     });
   });
 
@@ -201,8 +242,12 @@ function bindEvents() {
       await render();
       const card = masonry.querySelector('[data-type="shortcuts"]');
       if (card) {
-        const rows = card.querySelectorAll('.shortcut-row');
-        if (rows.length) rows[rows.length - 1].querySelector('.kw-input')?.focus();
+        const entries = card.querySelectorAll('.item-entry');
+        if (entries.length) {
+          const last = entries[entries.length - 1];
+          last.classList.add('expanded');
+          last.querySelector('[data-field="keyword"]')?.focus();
+        }
       }
     });
   });

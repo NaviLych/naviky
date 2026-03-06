@@ -148,33 +148,103 @@ body {
   color: var(--text-muted);
 }
 
-/* ── Link / shortcut rows ----------------------------------------- */
-.card-links {
+/* ── Item list (collapsed titles) ---------------------------------- */
+.card-items {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.2rem;
   margin-bottom: 0.75rem;
 }
 
-.link-row {
+.item-entry {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background 0.15s;
+}
+
+.item-title {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: space-between;
+  padding: 0.45rem 0.6rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.12s;
+  user-select: none;
 }
 
-.link-title-input {
-  width: 35%;
-  flex-shrink: 0;
+.item-title:hover {
+  background: var(--result-hover);
 }
 
-.link-url-input {
-  flex: 1;
+.item-label {
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 0;
 }
 
-.kw-input {
-  width: 70px;
+.item-label em {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.item-chevron {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
   flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.item-entry.expanded .item-chevron {
+  transform: rotate(90deg);
+}
+
+/* Detail panel (hidden by default) */
+.item-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, padding 0.25s ease;
+  padding: 0 0.6rem;
+}
+
+.item-entry.expanded .item-detail {
+  max-height: 500px;
+  padding: 0.35rem 0.6rem 0.5rem;
+}
+
+/* ── Detail rows (inputs shown on expand) -------------------------- */
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+}
+
+.detail-row .input-sm {
+  width: 100%;
+  word-break: break-all;
+}
+
+/* URL textarea for word-wrap */
+.url-textarea {
+  resize: vertical;
+  min-height: 2.2rem;
+  line-height: 1.4;
+  word-break: break-all;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.detail-row .delete-btn-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.kw-input {
+  width: 100%;
 }
 
 /* ── Buttons ------------------------------------------------------- */
