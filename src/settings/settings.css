@@ -109,27 +109,6 @@ body {
   color: var(--text-muted);
 }
 
-.input-sm {
-  padding: 0.45rem 0.65rem;
-  font-size: 0.88rem;
-  border: 1px solid var(--input-border);
-  border-radius: 8px;
-  background: var(--input-bg);
-  color: var(--text-primary);
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
-}
-
-.input-sm:focus {
-  border-color: var(--input-focus-border);
-}
-
-.input-wide {
-  flex: 1;
-  min-width: 0;
-}
-
 /* ── Theme toggle -------------------------------------------------- */
 .theme-toggle {
   display: flex;
@@ -188,134 +167,12 @@ body {
   background: var(--accent-hover);
 }
 
-.btn-sm {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.82rem;
-}
-
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-
-.btn-icon:hover {
-  background: rgba(255, 60, 60, 0.15);
-  color: var(--danger);
-}
-
-/* ── Editable list (shortcuts / links) ----------------------------- */
-.editable-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.shortcut-row,
-.link-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.shortcut-row .input-sm:first-child {
-  width: 110px;
-  flex-shrink: 0;
-}
-
-.link-row .input-sm:first-child {
-  width: 140px;
-  flex-shrink: 0;
-}
-
-/* ── Groups master-detail ------------------------------------------ */
-.groups-container {
-  display: flex;
-  gap: 1rem;
-  min-height: 200px;
-}
-
-.groups-sidebar {
-  width: 180px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.group-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.group-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.group-item:hover {
-  background: var(--result-hover);
-}
-
-.group-item.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-.group-item.active .btn-icon {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.group-item.active .btn-icon:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.group-name {
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.groups-content {
-  flex: 1;
-  min-width: 0;
-  background: var(--input-bg);
-  border-radius: 12px;
-  padding: 1rem;
-}
-
-.groups-content h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 0.75rem;
-}
-
-/* ── Placeholder --------------------------------------------------- */
-.placeholder-text {
-  color: var(--text-muted);
-  text-align: center;
-  padding: 2rem 0;
-  font-size: 0.9rem;
+/* ── Info ---------------------------------------------------------- */
+.info-text {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0.6rem;
 }
 
 /* ── Hint text ----------------------------------------------------- */
@@ -338,14 +195,6 @@ body {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-}
-
-/* ── Link list inside group detail --------------------------------- */
-.link-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
 }
 
 /* ── Scrollbar (Webkit) -------------------------------------------- */
