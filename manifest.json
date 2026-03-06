@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Naviky",
+  "version": "1.0.0",
+  "description": "A sleek new tab page with smart search, link management, and global search panel.",
+  "permissions": [
+    "tabs",
+    "history",
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "chrome_url_overrides": {
+    "newtab": "src/newtab/newtab.html"
+  },
+  "commands": {
+    "toggle-search-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Q"
+      },
+      "description": "Toggle Naviky search panel"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/panel/panel.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

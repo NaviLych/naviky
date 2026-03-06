@@ -1,0 +1,45 @@
+/* =================================================================
+   Naviky – shared CSS custom‑properties (theme tokens)
+   Import this file from any page CSS:  @import url('../shared/theme.css');
+   ================================================================= */
+
+/* ── Light theme --------------------------------------------------- */
+:root,
+[data-theme="light"] {
+  --page-bg: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-solid: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  --text-primary: #1a1a2e;
+  --text-secondary: #444;
+  --text-muted: #888;
+  --input-bg: rgba(255, 255, 255, 0.35);
+  --input-border: rgba(255, 255, 255, 0.5);
+  --input-focus-border: rgba(100, 100, 255, 0.5);
+  --result-hover: rgba(255, 255, 255, 0.3);
+  --accent: #6c5ce7;
+  --accent-hover: #5b4cdb;
+  --danger: #e74c3c;
+  --danger-hover: #c0392b;
+}
+
+/* ── Dark theme ---------------------------------------------------- */
+[data-theme="dark"] {
+  --page-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-solid: rgba(30, 30, 50, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --text-primary: #e8e8f0;
+  --text-secondary: #b0b0c0;
+  --text-muted: #707080;
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --input-focus-border: rgba(120, 120, 255, 0.4);
+  --result-hover: rgba(255, 255, 255, 0.12);
+  --accent: #7c6ff7;
+  --accent-hover: #6b5ce7;
+  --danger: #ff6b6b;
+  --danger-hover: #ee5a5a;
+}

@@ -1,0 +1,166 @@
+/* =================================================================
+   Naviky – Global search panel styles (inside Shadow DOM)
+   Always uses a dark‑glass theme for visual consistency
+   across all host pages.
+   ================================================================= */
+
+/* ── Reset (scoped to shadow) -------------------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Overlay ------------------------------------------------------- */
+.nk-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ── Container ----------------------------------------------------- */
+.nk-container {
+  width: 90%;
+  max-width: 600px;
+  background: rgba(25, 25, 48, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: nk-slide-in 0.18s ease-out;
+}
+
+@keyframes nk-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Search input -------------------------------------------------- */
+.nk-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.05rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e8e8f0;
+  outline: none;
+  font-family: inherit;
+  caret-color: #7c6ff7;
+}
+
+.nk-input::placeholder {
+  color: #606078;
+}
+
+/* When results exist, remove bottom rounding */
+.nk-container.has-results .nk-input {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Results list -------------------------------------------------- */
+.nk-results {
+  list-style: none;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: none;
+}
+
+.nk-results.visible {
+  display: block;
+}
+
+.nk-results li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.nk-results li:hover,
+.nk-results li.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nk-results li.hint {
+  opacity: 0.5;
+}
+
+/* ── Icon ---------------------------------------------------------- */
+.nk-icon {
+  font-size: 1.15rem;
+  width: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Info ---------------------------------------------------------- */
+.nk-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nk-title {
+  font-size: 0.9rem;
+  color: #e8e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nk-url {
+  font-size: 0.72rem;
+  color: #606078;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+/* ── Badge --------------------------------------------------------- */
+.nk-badge {
+  font-size: 0.58rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: #7c6ff7;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* ── Scrollbar (Webkit) -------------------------------------------- */
+.nk-results::-webkit-scrollbar {
+  width: 5px;
+}
+
+.nk-results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nk-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}

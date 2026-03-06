@@ -1,0 +1,361 @@
+/* =================================================================
+   Naviky – Settings page styles
+   ================================================================= */
+@import url('../shared/theme.css');
+
+/* ── Reset --------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Page ---------------------------------------------------------- */
+body {
+  min-height: 100vh;
+  background: var(--page-bg);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-primary);
+  transition: background 0.4s ease, color 0.3s ease;
+}
+
+/* ── Container ----------------------------------------------------- */
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Header -------------------------------------------------------- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.back-btn {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.back-btn:hover {
+  background: var(--result-hover);
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+/* ── Glass card ---------------------------------------------------- */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--glass-shadow);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* ── Form elements ------------------------------------------------- */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-sm {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.input-sm:focus {
+  border-color: var(--input-focus-border);
+}
+
+.input-wide {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Theme toggle -------------------------------------------------- */
+.theme-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.theme-btn {
+  padding: 0.5rem 1.2rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.theme-btn:hover {
+  background: var(--result-hover);
+}
+
+.theme-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Buttons ------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background: var(--result-hover);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 60, 60, 0.15);
+  color: var(--danger);
+}
+
+/* ── Editable list (shortcuts / links) ----------------------------- */
+.editable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.shortcut-row,
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shortcut-row .input-sm:first-child {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.link-row .input-sm:first-child {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+/* ── Groups master-detail ------------------------------------------ */
+.groups-container {
+  display: flex;
+  gap: 1rem;
+  min-height: 200px;
+}
+
+.groups-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.group-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.group-item:hover {
+  background: var(--result-hover);
+}
+
+.group-item.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.group-item.active .btn-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.group-item.active .btn-icon:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.group-name {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groups-content {
+  flex: 1;
+  min-width: 0;
+  background: var(--input-bg);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.groups-content h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Placeholder --------------------------------------------------- */
+.placeholder-text {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+}
+
+/* ── Hint text ----------------------------------------------------- */
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.hint code {
+  background: var(--input-bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+/* ── Data actions -------------------------------------------------- */
+.data-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Link list inside group detail --------------------------------- */
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Scrollbar (Webkit) -------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Tab – Naviky</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <main class="container">
+    <h1 class="greeting" id="greeting" title="Click to open settings">Hello</h1>
+    <div class="search-wrapper" id="searchWrapper">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search tabs, history, links, or the web…"
+        autocomplete="off"
+        spellcheck="false"
+        autofocus
+      >
+      <ul class="search-results" id="searchResults"></ul>
+    </div>
+  </main>
+  <script type="module" src="newtab.js"></script>
+</body>
+</html>
