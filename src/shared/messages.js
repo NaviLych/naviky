@@ -12,4 +12,10 @@ export const MSG = {
 
   // Settings retrieval (panel → service worker)
   GET_SETTINGS: 'GET_SETTINGS',
+
+  // Bookmark (context menu → service worker → content script)
+  GET_GROUPS: 'GET_GROUPS',
+  ADD_LINK: 'ADD_LINK',
+  ADD_GROUP: 'ADD_GROUP',
+  BOOKMARK_PAGE: 'BOOKMARK_PAGE',
 };

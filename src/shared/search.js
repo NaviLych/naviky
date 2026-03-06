@@ -40,6 +40,7 @@ export function buildShortcutUrl(template, query) {
  * @param {(q:string) => Promise<chrome.tabs.Tab[]>}              providers.searchTabs
  * @param {(q:string) => Promise<chrome.history.HistoryItem[]>}   providers.searchHistory
  * @param {() => Promise<{title:string,url:string}[]>}            providers.getLinks
+ * @param {() => Promise<{id:number,name:string}[]>}             [providers.getGroups]
  * @returns {Promise<SearchResult[]>}
  */
 export async function searchAll(query, providers) {
@@ -135,18 +136,26 @@ export async function searchAll(query, providers) {
   /* 4 ── Saved links ----------------------------------------------- */
   try {
     const links = await providers.getLinks();
+    const groups = providers.getGroups ? await providers.getGroups() : [];
+    const groupMap = {};
+    for (const g of groups) {
+      groupMap[g.id] = g.name;
+    }
+
     const matched = links.filter(
       (l) =>
         (l.title && l.title.toLowerCase().includes(lower)) ||
-        (l.url && l.url.toLowerCase().includes(lower)),
+        (l.url && l.url.toLowerCase().includes(lower)) ||
+        (groupMap[l.groupId] && groupMap[l.groupId].toLowerCase().includes(lower)),
     );
     for (const link of matched.slice(0, 5)) {
       if (results.some((r) => r.url === link.url)) continue;
+      const groupName = groupMap[link.groupId];
       results.push({
         type: 'link',
         title: link.title || link.url,
         url: link.url,
-        description: 'Saved link',
+        description: groupName ? groupName : 'Saved link',
         icon: '📌',
       });
     }

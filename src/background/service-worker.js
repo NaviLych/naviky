@@ -19,6 +19,13 @@ import { MSG } from '../shared/messages.js';
 
 chrome.runtime.onInstalled.addListener(async () => {
   await db.initDefaults();
+
+  /* ── Context menu: Bookmark this page ─────────────────────────── */
+  chrome.contextMenus.create({
+    id: 'naviky-bookmark-page',
+    title: 'Naviky – Save to Links',
+    contexts: ['page'],
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -51,6 +58,34 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
 });
 
 /* ------------------------------------------------------------------ */
+/*  Context menu click → inject bookmark dialog                        */
+/* ------------------------------------------------------------------ */
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== 'naviky-bookmark-page') return;
+  if (!tab?.id) return;
+
+  const url = tab.url || '';
+  if (
+    url.startsWith('chrome://') ||
+    url.startsWith('chrome-extension://') ||
+    url.startsWith('edge://') ||
+    url.startsWith('about:')
+  ) {
+    return;
+  }
+
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['src/panel/bookmark.js'],
+    });
+  } catch (err) {
+    console.error('[Naviky] bookmark dialog injection failed:', err);
+  }
+});
+
+/* ------------------------------------------------------------------ */
 /*  Search providers (used by the message handler below)               */
 /* ------------------------------------------------------------------ */
 
@@ -60,6 +95,7 @@ const searchProviders = {
   searchHistory: (query) =>
     chrome.history.search({ text: query, maxResults: 10 }),
   getLinks: () => db.getAll(db.STORES.LINKS),
+  getGroups: () => db.getAll(db.STORES.GROUPS),
 };
 
 /* ------------------------------------------------------------------ */
@@ -99,6 +135,27 @@ async function handleMessage(message, sender) {
       const userName = await db.getSetting('userName');
       const theme = await db.getSetting('theme');
       return { greeting, userName, theme };
+    }
+
+    case MSG.GET_GROUPS:
+      return db.getAll(db.STORES.GROUPS);
+
+    case MSG.ADD_GROUP: {
+      const groupId = await db.add(db.STORES.GROUPS, {
+        name: message.name,
+        order: message.order ?? 0,
+      });
+      return { id: groupId, name: message.name };
+    }
+
+    case MSG.ADD_LINK: {
+      const linkId = await db.add(db.STORES.LINKS, {
+        groupId: message.groupId,
+        title: message.title,
+        url: message.url,
+        order: message.order ?? 0,
+      });
+      return { id: linkId };
     }
 
     default:

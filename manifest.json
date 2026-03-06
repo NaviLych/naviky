@@ -8,7 +8,8 @@
     "history",
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "contextMenus"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js",

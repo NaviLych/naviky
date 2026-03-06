@@ -214,4 +214,13 @@
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closePanel();
   });
+
+  /* ── Close on Escape anywhere on the page ─────────────────────── */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && host.style.display !== 'none') {
+      e.preventDefault();
+      e.stopPropagation();
+      closePanel();
+    }
+  }, true);
 })();

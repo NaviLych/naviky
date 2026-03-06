@@ -71,6 +71,7 @@ const searchProviders = {
   searchTabs: () => chrome.tabs.query({}),
   searchHistory: (q) => chrome.history.search({ text: q, maxResults: 10 }),
   getLinks: () => db.getAll(db.STORES.LINKS),
+  getGroups: () => db.getAll(db.STORES.GROUPS),
 };
 
 let activeIndex = -1;
@@ -105,12 +106,35 @@ function renderResults(results) {
   searchWrapper.classList.add('has-results');
 }
 
+const MANAGE_KEYWORDS = ['manage', 'links', 'groups', 'shortcuts', '管理', '链接', '分组', '快捷'];
+
 const doSearch = debounce(async (query) => {
   if (!query.trim()) {
     renderResults([]);
     return;
   }
   const results = await searchAll(query, searchProviders);
+
+  // Inject "Manage" entry when link results exist or query matches manage keywords
+  const hasLinks = results.some((r) => r.type === 'link');
+  const queryLower = query.trim().toLowerCase();
+  const matchesManage = MANAGE_KEYWORDS.some((kw) => queryLower.includes(kw));
+  if (hasLinks || matchesManage) {
+    const manageEntry = {
+      type: 'manage',
+      title: 'Manage Links, Groups & Shortcuts',
+      url: 'manage.html',
+      description: 'Open management page',
+      icon: '⚙️',
+    };
+    const googleIdx = results.findIndex((r) => r.type === 'google');
+    if (googleIdx >= 0) {
+      results.splice(googleIdx, 0, manageEntry);
+    } else {
+      results.push(manageEntry);
+    }
+  }
+
   renderResults(results);
 }, 150);
 
