@@ -181,8 +181,7 @@ async function initAISettings() {
   });
 
   // Test connection
-  document.getElementById('aiTestBtn')?.addEventListener('click', async () => {
-    const resultEl = document.getElementById('aiTestResult');
+  document.getElementById('aiTestBtn')?.addEventListener('click', async () => {    const resultEl = document.getElementById('aiTestResult');
     resultEl.textContent = '测试中…';
     resultEl.style.color = '';
 
@@ -208,6 +207,79 @@ async function initAISettings() {
 }
 
 /* ================================================================== */
+/*  Custom Prompt Buttons                                              */
+/* ================================================================== */
+
+async function initCustomPromptsUI() {
+  const container = document.getElementById('customPromptsContainer');
+  const addBtn = document.getElementById('addCustomPromptBtn');
+  if (!container || !addBtn) return;
+
+  let prompts = [];
+  try {
+    const raw = (await db.getSetting('aiCustomPrompts')) || '[]';
+    prompts = JSON.parse(raw);
+  } catch (_) {
+    prompts = [];
+  }
+
+  function renderRows() {
+    container.innerHTML = '';
+    prompts.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'custom-prompt-row';
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.className = 'input';
+      nameInput.placeholder = '按钮名称';
+      nameInput.value = p.name;
+      nameInput.addEventListener('input', debounce(() => {
+        prompts[i].name = nameInput.value;
+        save();
+      }, 400));
+
+      const promptInput = document.createElement('textarea');
+      promptInput.className = 'input input-textarea';
+      promptInput.rows = 2;
+      promptInput.placeholder = 'Prompt 模板，可用 {text} 占位';
+      promptInput.value = p.prompt;
+      promptInput.addEventListener('input', debounce(() => {
+        prompts[i].prompt = promptInput.value;
+        save();
+      }, 400));
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'btn btn-sm btn-danger';
+      delBtn.textContent = '删除';
+      delBtn.addEventListener('click', () => {
+        prompts.splice(i, 1);
+        save();
+        renderRows();
+      });
+
+      row.appendChild(nameInput);
+      row.appendChild(promptInput);
+      row.appendChild(delBtn);
+      container.appendChild(row);
+    });
+  }
+
+  async function save() {
+    await db.setSetting('aiCustomPrompts', JSON.stringify(prompts));
+  }
+
+  addBtn.addEventListener('click', () => {
+    prompts.push({ name: '自定义', prompt: '{text}' });
+    save();
+    renderRows();
+  });
+
+  renderRows();
+}
+
+/* ================================================================== */
 /*  Init                                                               */
 /* ================================================================== */
 
@@ -216,6 +288,7 @@ async function init() {
   await loadTheme();
   await initPersonalization();
   await initAISettings();
+  await initCustomPromptsUI();
 }
 
 init();

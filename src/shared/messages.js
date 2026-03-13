@@ -22,4 +22,5 @@ export const MSG = {
   // AI assistant (content script → service worker)
   AI_QUERY: 'AI_QUERY',
   AI_FETCH_MODELS: 'AI_FETCH_MODELS',
+  AI_GET_CUSTOM_PROMPTS: 'AI_GET_CUSTOM_PROMPTS',
 };

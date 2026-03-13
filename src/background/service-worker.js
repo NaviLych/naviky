@@ -161,6 +161,12 @@ async function handleMessage(message, sender) {
     case MSG.AI_QUERY:
       return handleAIQuery(message);
 
+    case MSG.AI_GET_CUSTOM_PROMPTS: {
+      const raw = await db.getSetting('aiCustomPrompts');
+      try { return { prompts: JSON.parse(raw || '[]') }; }
+      catch (_) { return { prompts: [] }; }
+    }
+
     case MSG.AI_FETCH_MODELS:
       return handleFetchModels();
 
@@ -223,10 +229,15 @@ async function handleAIQuery(message) {
     };
   }
 
-  let systemPrompt;
-  let userPrompt;
+  // If the caller supplies a pre-built messages array (follow-up / custom prompt),
+  // use it directly; otherwise construct from action + text.
+  let apiMessages;
+  let systemPrompt = '';
+  let userPrompt   = '';
 
-  if (message.action === 'translate') {
+  if (message.messages) {
+    apiMessages = message.messages;
+  } else if (message.action === 'translate') {
     const targetLang = (await db.getSetting('aiTargetLanguage')) || 'Chinese';
     const template =
       (await db.getSetting('aiTranslatePrompt')) ||
@@ -235,6 +246,10 @@ async function handleAIQuery(message) {
     userPrompt = template
       .replace('{lang}', targetLang)
       .replace('{text}', message.text);
+    apiMessages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user',   content: userPrompt   },
+    ];
   } else {
     const targetLang = (await db.getSetting('aiTargetLanguage')) || 'Chinese';
     const template =
@@ -244,6 +259,10 @@ async function handleAIQuery(message) {
     userPrompt = template
       .replace('{lang}', targetLang)
       .replace('{text}', message.text);
+    apiMessages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user',   content: userPrompt   },
+    ];
   }
 
   // Normalise base URL: strip trailing slash then append path
@@ -259,10 +278,7 @@ async function handleAIQuery(message) {
       },
       body: JSON.stringify({
         model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user',   content: userPrompt   },
-        ],
+        messages: apiMessages,
         max_tokens: 1000,
         stream: false,
       }),
@@ -289,5 +305,6 @@ async function handleAIQuery(message) {
   const result = data?.choices?.[0]?.message?.content?.trim() ?? '';
   if (!result) return { error: 'API 返回了空响应。' };
 
-  return { result };
+  // Return the prompts used so the content script can reconstruct conversation history
+  return { result, systemPrompt, userPrompt };
 }

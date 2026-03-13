@@ -222,6 +222,33 @@ body {
   white-space: nowrap;
 }
 
+/* ── Custom prompt rows -------------------------------------------- */
+.custom-prompt-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 0.5rem;
+  align-items: start;
+  margin-bottom: 0.6rem;
+}
+
+.custom-prompt-row .input {
+  font-size: 0.88rem;
+}
+
+.custom-prompt-row .input-textarea {
+  min-height: 56px;
+}
+
+.btn-danger {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #f87171;
+}
+
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: #f87171;
+}
+
 /* ── Scrollbar (Webkit) -------------------------------------------- */
 ::-webkit-scrollbar {
   width: 6px;

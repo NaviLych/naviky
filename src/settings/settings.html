@@ -96,6 +96,13 @@
                   placeholder="Explain the following text briefly and clearly in {lang}:\n\n{text}"></textarea>
       </div>
 
+      <div class="form-group">
+        <label>自定义 Prompt 按钮</label>
+        <p class="hint" style="margin-bottom:0.6rem">每个按钮会在划词弹窗中显示，可用 <code>{text}</code> 作为所选文字的占位符。</p>
+        <div id="customPromptsContainer"></div>
+        <button class="btn btn-sm" id="addCustomPromptBtn" type="button">+ 添加按钮</button>
+      </div>
+
       <button class="btn" id="aiTestBtn">⚡ 测试连接</button>
       <span id="aiTestResult" class="hint" style="margin-left:0.75rem;"></span>
     </section>
