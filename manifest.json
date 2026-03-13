@@ -11,6 +11,7 @@
     "scripting",
     "contextMenus"
   ],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "src/background/service-worker.js",
     "type": "module"
@@ -26,6 +27,13 @@
       "description": "Toggle Naviky search panel"
     }
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/ai/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "web_accessible_resources": [
     {
       "resources": ["src/panel/panel.css"],

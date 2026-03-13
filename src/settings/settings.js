@@ -138,10 +138,84 @@ document.getElementById('importFile').addEventListener('change', async (e) => {
 /*  Init                                                               */
 /* ================================================================== */
 
+/* ================================================================== */
+/*  AI Settings                                                        */
+/* ================================================================== */
+
+async function initAISettings() {
+  const fields = [
+    { id: 'aiEndpointInput',       key: 'aiEndpoint'         },
+    { id: 'aiApiKeyInput',         key: 'aiApiKey'           },
+    { id: 'aiModelInput',          key: 'aiModel'            },
+    { id: 'aiTargetLangInput',     key: 'aiTargetLanguage'   },
+    { id: 'aiTranslatePromptInput',key: 'aiTranslatePrompt'  },
+    { id: 'aiExplainPromptInput',  key: 'aiExplainPrompt'    },
+  ];
+
+  // Load saved values
+  for (const { id, key } of fields) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.value = (await db.getSetting(key)) ?? '';
+  }
+
+  if (initAISettings.bound) return;
+  initAISettings.bound = true;
+
+  // Auto-save on change
+  for (const { id, key } of fields) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.addEventListener(
+      'input',
+      debounce(async (e) => {
+        await db.setSetting(key, e.target.value.trim());
+      }, 400),
+    );
+  }
+
+  // Show/hide API key
+  document.getElementById('aiApiKeyToggle')?.addEventListener('click', () => {
+    const input = document.getElementById('aiApiKeyInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+
+  // Test connection
+  document.getElementById('aiTestBtn')?.addEventListener('click', async () => {
+    const resultEl = document.getElementById('aiTestResult');
+    resultEl.textContent = '测试中…';
+    resultEl.style.color = '';
+
+    try {
+      const res = await chrome.runtime.sendMessage({
+        type: 'AI_QUERY',
+        text: 'Hello',
+        action: 'explain',
+      });
+
+      if (res?.error) {
+        resultEl.textContent = '✖ ' + res.error;
+        resultEl.style.color = 'var(--danger, #f87171)';
+      } else {
+        resultEl.textContent = '✓ 连接成功';
+        resultEl.style.color = 'var(--success, #4ade80)';
+      }
+    } catch (err) {
+      resultEl.textContent = '✖ ' + err.message;
+      resultEl.style.color = 'var(--danger, #f87171)';
+    }
+  });
+}
+
+/* ================================================================== */
+/*  Init                                                               */
+/* ================================================================== */
+
 async function init() {
   await db.initDefaults();
   await loadTheme();
   await initPersonalization();
+  await initAISettings();
 }
 
 init();

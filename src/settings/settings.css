@@ -197,6 +197,31 @@ body {
   flex-wrap: wrap;
 }
 
+/* ── Textarea input ------------------------------------------------ */
+.input-textarea {
+  resize: vertical;
+  min-height: 72px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* ── Input row (input + small button side by side) ----------------- */
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-row .input {
+  flex: 1;
+}
+
+.btn-sm {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 /* ── Scrollbar (Webkit) -------------------------------------------- */
 ::-webkit-scrollbar {
   width: 6px;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
@@ -50,7 +50,55 @@
         On the new tab page, search for <code>links</code> to open the management page.
       </p>
     </section>
+    <!-- ─── AI Assistant ─────────────────────────────────── -->
+    <section class="card">
+      <h2 class="card-title">AI 助手</h2>
+      <p class="info-text">
+        配置任意兼容 OpenAI 接口的 AI 服务。在任意网页中划选文字，即可弹出浮窗进行翻译或解释。
+      </p>
 
+      <div class="form-group">
+        <label for="aiEndpointInput">API 地址（Base URL）</label>
+        <input type="text" id="aiEndpointInput" class="input"
+               placeholder="https://api.openai.com/v1">
+      </div>
+
+      <div class="form-group">
+        <label for="aiApiKeyInput">API 密钥</label>
+        <div class="input-row">
+          <input type="password" id="aiApiKeyInput" class="input"
+                 placeholder="sk-..." autocomplete="off">
+          <button class="btn btn-sm" id="aiApiKeyToggle" type="button">👁</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="aiModelInput">模型名称</label>
+        <input type="text" id="aiModelInput" class="input"
+               placeholder="gpt-4o-mini">
+      </div>
+
+      <div class="form-group">
+        <label for="aiTargetLangInput">翻译目标语言</label>
+        <input type="text" id="aiTargetLangInput" class="input"
+               placeholder="Chinese">
+      </div>
+
+      <div class="form-group">
+        <label for="aiTranslatePromptInput">翻译 Prompt（可用 {text} 和 {lang} 作为占位符）</label>
+        <textarea id="aiTranslatePromptInput" class="input input-textarea" rows="3"
+                  placeholder="Translate the following text to {lang}. Output only the translation:\n\n{text}"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="aiExplainPromptInput">解释 Prompt（可用 {text} 作为占位符）</label>
+        <textarea id="aiExplainPromptInput" class="input input-textarea" rows="3"
+                  placeholder="Explain the following text briefly and clearly:\n\n{text}"></textarea>
+      </div>
+
+      <button class="btn" id="aiTestBtn">⚡ 测试连接</button>
+      <span id="aiTestResult" class="hint" style="margin-left:0.75rem;"></span>
+    </section>
     <!-- ─── Data Management ─────────────────────────────────────── -->
     <section class="card">
       <h2 class="card-title">Data Management</h2>

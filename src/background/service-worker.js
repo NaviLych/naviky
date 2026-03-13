@@ -158,7 +158,92 @@ async function handleMessage(message, sender) {
       return { id: linkId };
     }
 
+    case MSG.AI_QUERY:
+      return handleAIQuery(message);
+
     default:
       return { error: 'Unknown message type: ' + message.type };
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  AI Query – calls any OpenAI-compatible chat completions endpoint   */
+/* ------------------------------------------------------------------ */
+
+async function handleAIQuery(message) {
+  const endpoint = await db.getSetting('aiEndpoint');
+  const apiKey   = await db.getSetting('aiApiKey');
+  const model    = (await db.getSetting('aiModel')) || 'gpt-4o-mini';
+
+  if (!endpoint || !apiKey) {
+    return {
+      error:
+        '未配置 AI 接口。请在扩展设置页面的"AI 助手"部分填写 API 地址和密钥。',
+    };
+  }
+
+  let systemPrompt;
+  let userPrompt;
+
+  if (message.action === 'translate') {
+    const targetLang = (await db.getSetting('aiTargetLanguage')) || 'Chinese';
+    const template =
+      (await db.getSetting('aiTranslatePrompt')) ||
+      'Translate the following text to {lang}. Output only the translation:\n\n{text}';
+    systemPrompt = 'You are a professional translator.';
+    userPrompt = template
+      .replace('{lang}', targetLang)
+      .replace('{text}', message.text);
+  } else {
+    const template =
+      (await db.getSetting('aiExplainPrompt')) ||
+      'Explain the following text briefly and clearly:\n\n{text}';
+    systemPrompt = 'You are a helpful assistant that explains concepts clearly and concisely.';
+    userPrompt = template.replace('{text}', message.text);
+  }
+
+  // Normalise base URL: strip trailing slash then append path
+  const apiUrl = endpoint.replace(/\/+$/, '') + '/chat/completions';
+
+  let response;
+  try {
+    response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: userPrompt   },
+        ],
+        max_tokens: 1000,
+        stream: false,
+      }),
+    });
+  } catch (networkErr) {
+    return { error: '网络请求失败: ' + networkErr.message };
+  }
+
+  if (!response.ok) {
+    let body = '';
+    try { body = await response.text(); } catch (_) {}
+    // Avoid leaking the full body which may be large; cap at 200 chars
+    const preview = body.length > 200 ? body.slice(0, 200) + '…' : body;
+    return { error: `API 错误 ${response.status}: ${preview}` };
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (parseErr) {
+    return { error: '无法解析 API 响应: ' + parseErr.message };
+  }
+
+  const result = data?.choices?.[0]?.message?.content?.trim() ?? '';
+  if (!result) return { error: 'API 返回了空响应。' };
+
+  return { result };
 }

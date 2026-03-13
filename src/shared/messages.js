@@ -18,4 +18,7 @@ export const MSG = {
   ADD_LINK: 'ADD_LINK',
   ADD_GROUP: 'ADD_GROUP',
   BOOKMARK_PAGE: 'BOOKMARK_PAGE',
+
+  // AI assistant (content script → service worker)
+  AI_QUERY: 'AI_QUERY',
 };

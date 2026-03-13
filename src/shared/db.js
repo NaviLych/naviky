@@ -34,6 +34,13 @@ const DEFAULT_SETTINGS = [
   { key: 'greeting', value: '' },
   { key: 'userName', value: '' },
   { key: 'theme', value: 'dark' },
+  // AI assistant
+  { key: 'aiEndpoint', value: '' },
+  { key: 'aiApiKey', value: '' },
+  { key: 'aiModel', value: 'gpt-4o-mini' },
+  { key: 'aiTargetLanguage', value: 'Chinese' },
+  { key: 'aiTranslatePrompt', value: 'Translate the following text to {lang}. Output only the translation, no explanation:\n\n{text}' },
+  { key: 'aiExplainPrompt', value: 'Explain the following text briefly and clearly in the same language as the text:\n\n{text}' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -190,10 +197,11 @@ async function initDefaults() {
     }
   } catch (_) { /* store may not exist yet */ }
 
+  // Seed individual missing settings (safe for both fresh installs and upgrades)
   try {
-    const settings = await getAll(STORES.SETTINGS);
-    if (settings.length === 0) {
-      for (const s of DEFAULT_SETTINGS) {
+    for (const s of DEFAULT_SETTINGS) {
+      const existing = await getById(STORES.SETTINGS, s.key);
+      if (!existing) {
         try { await add(STORES.SETTINGS, s); } catch (_) { /* ignore race */ }
       }
     }
