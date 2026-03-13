@@ -343,6 +343,89 @@ body {
   flex: 1;
 }
 
+/* ── Model combobox ------------------------------------------------ */
+.st-model-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.st-model-dropdown {
+  position: fixed;
+  background: rgba(18, 18, 36, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.st-model-dropdown[hidden] { display: none; }
+
+/* Search bar inside the dropdown */
+.st-model-search-wrap {
+  padding: 7px 7px 5px;
+  border-bottom: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.st-model-search {
+  width: 100%;
+  padding: 0.38rem 0.7rem;
+  font-size: 0.82rem;
+  border: 1px solid var(--input-border);
+  border-radius: 7px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.st-model-search:focus {
+  border-color: var(--input-focus-border);
+}
+
+.st-model-search::placeholder {
+  color: var(--text-muted);
+}
+
+/* Scrollable list */
+.st-model-list {
+  list-style: none;
+  overflow-y: auto;
+  max-height: 220px;
+  padding: 4px 0;
+  margin: 0;
+}
+
+.st-model-list li {
+  padding: 0.44rem 0.9rem;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.08s;
+}
+
+.st-model-list li:hover,
+.st-model-list li.nk-active {
+  background: var(--result-hover);
+}
+
+.st-model-list::-webkit-scrollbar { width: 4px; }
+.st-model-list::-webkit-scrollbar-track { background: transparent; }
+.st-model-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
 /* ── Theme toggle -------------------------------------------------- */
 .st-theme-toggle {
   display: flex;

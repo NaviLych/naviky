@@ -305,6 +305,8 @@ function updateThemeButtons(theme) {
 /*  Settings – AI                                                      */
 /* ------------------------------------------------------------------ */
 
+let _availableModels = [];
+
 async function initAISettings() {
   const fields = [
     { id: 'aiEndpointInput',        key: 'aiEndpoint'        },
@@ -350,12 +352,11 @@ async function initAISettings() {
         resultEl.textContent = '✖ ' + res.error;
         resultEl.style.color = '#f87171';
       } else {
-        const datalist = document.getElementById('aiModelList');
-        datalist.innerHTML = res.models
-          .map((id) => `<option value="${id}"></option>`)
-          .join('');
+        _availableModels = res.models;
         resultEl.textContent = `✓ 获取到 ${res.models.length} 个模型`;
         resultEl.style.color = '#4ade80';
+        // Refresh dropdown if it's currently open
+        if (!modelDropdown.hidden) renderList('');
       }
     } catch (err) {
       resultEl.textContent = '✖ ' + err.message;
@@ -365,6 +366,113 @@ async function initAISettings() {
       btn.textContent = '↻';
     }
   });
+
+  // ── Model combobox ──────────────────────────────────────────────
+  const modelInput    = document.getElementById('aiModelInput');
+  const modelDropdown = document.getElementById('aiModelDropdown');
+  const modelSearch   = document.getElementById('aiModelSearch');
+  const modelList     = document.getElementById('aiModelList');
+  let _activeIdx = -1;
+
+  function positionDropdown() {
+    const r = modelInput.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - r.bottom;
+    const dropH = Math.min(288, _availableModels.length * 33 + 52);
+    modelDropdown.style.left  = r.left + 'px';
+    modelDropdown.style.width = r.width + 'px';
+    if (spaceBelow >= dropH || spaceBelow >= 140) {
+      modelDropdown.style.top    = (r.bottom + 4) + 'px';
+      modelDropdown.style.bottom = '';
+    } else {
+      modelDropdown.style.top    = '';
+      modelDropdown.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    }
+  }
+
+  function renderList(filter) {
+    const q = (filter ?? modelSearch.value).trim().toLowerCase();
+    const matches = q
+      ? _availableModels.filter((m) => m.toLowerCase().includes(q))
+      : [..._availableModels];
+    _activeIdx = -1;
+    if (!matches.length) {
+      modelList.innerHTML = `<li style="color:var(--text-muted);cursor:default">无匹配结果</li>`;
+    } else {
+      modelList.innerHTML = matches.map((m) => `<li>${escapeHtml(m)}</li>`).join('');
+    }
+  }
+
+  function openModelDropdown() {
+    if (!_availableModels.length) return;
+    renderList('');
+    modelSearch.value = '';
+    positionDropdown();
+    modelDropdown.hidden = false;
+    modelSearch.focus();
+  }
+
+  function closeModelDropdown() {
+    modelDropdown.hidden = true;
+    _activeIdx = -1;
+  }
+
+  function pickModel(id) {
+    modelInput.value = id;
+    closeModelDropdown();
+    db.setSetting('aiModel', id);
+  }
+
+  function highlightItem(idx) {
+    const items = modelList.querySelectorAll('li');
+    items.forEach((li, i) => li.classList.toggle('nk-active', i === idx));
+    if (idx >= 0) items[idx]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  // Main input: click / focus opens dropdown
+  modelInput.addEventListener('mousedown', (e) => {
+    if (_availableModels.length) { e.preventDefault(); openModelDropdown(); }
+  });
+
+  // Search input: typing filters the list
+  modelSearch.addEventListener('input', () => renderList(modelSearch.value));
+
+  // Keyboard navigation on search input
+  modelSearch.addEventListener('keydown', (e) => {
+    const items = [...modelList.querySelectorAll('li')];
+    const selectable = items.filter((li) => li.style.cursor !== 'default');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _activeIdx = Math.min(_activeIdx + 1, selectable.length - 1);
+      highlightItem(_activeIdx);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _activeIdx = Math.max(_activeIdx - 1, 0);
+      highlightItem(_activeIdx);
+    } else if (e.key === 'Enter') {
+      const active = modelList.querySelector('li.nk-active');
+      if (active && active.style.cursor !== 'default') { e.preventDefault(); pickModel(active.textContent); }
+    } else if (e.key === 'Escape') {
+      e.preventDefault(); closeModelDropdown(); modelInput.focus();
+    }
+  });
+
+  // Click on list item
+  modelList.addEventListener('mousedown', (e) => {
+    const li = e.target.closest('li');
+    if (li && li.style.cursor !== 'default') { e.preventDefault(); pickModel(li.textContent); }
+  });
+
+  // Close when focus leaves both the input and the dropdown
+  modelInput.addEventListener('blur', () => setTimeout(() => {
+    if (!modelDropdown.contains(document.activeElement)) closeModelDropdown();
+  }, 150));
+
+  modelSearch.addEventListener('blur', () => setTimeout(() => {
+    if (document.activeElement !== modelInput) closeModelDropdown();
+  }, 150));
+
+  window.addEventListener('scroll', closeModelDropdown, true);
+  window.addEventListener('resize', () => { if (!modelDropdown.hidden) positionDropdown(); });
 
   document.getElementById('aiTestBtn').addEventListener('click', async () => {
     const resultEl = document.getElementById('aiTestResult');

@@ -73,9 +73,10 @@
           <div class="st-form-group">
             <label for="aiModelInput">模型名称</label>
             <div class="st-input-row">
-              <input type="text" id="aiModelInput" class="st-input"
-                     list="aiModelList" placeholder="gpt-4o-mini" autocomplete="off">
-              <datalist id="aiModelList"></datalist>
+              <div class="st-model-wrap">
+                <input type="text" id="aiModelInput" class="st-input"
+                       placeholder="gpt-4o-mini" autocomplete="off">
+              </div>
               <button class="st-btn st-btn-sm" id="aiFetchModelsBtn" type="button" title="从 API 获取可用模型">↻</button>
             </div>
           </div>
@@ -111,6 +112,15 @@
 
       </div>
     </div>
+  </div>
+
+  <!-- Model combobox dropdown (body-level to escape overflow:auto clipping) -->
+  <div class="st-model-dropdown" id="aiModelDropdown" hidden>
+    <div class="st-model-search-wrap">
+      <input type="text" class="st-model-search" id="aiModelSearch"
+             placeholder="搜索模型…" autocomplete="off" spellcheck="false">
+    </div>
+    <ul class="st-model-list" id="aiModelList"></ul>
   </div>
 
   <script type="module" src="newtab.js"></script>
