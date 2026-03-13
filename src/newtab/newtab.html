@@ -22,6 +22,92 @@
       <ul class="search-results" id="searchResults"></ul>
     </div>
   </main>
+  <!-- ─── Settings slide-in panel ──────────────────────────────────── -->
+  <div class="st-overlay" id="stOverlay" hidden>
+    <div class="st-panel" id="stPanel" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="st-header">
+        <span class="st-title">Settings</span>
+        <button class="st-close" id="stClose" aria-label="Close">✕</button>
+      </div>
+      <div class="st-body">
+
+        <!-- Personalization -->
+        <div class="st-card">
+          <h2 class="st-card-title">Personalization</h2>
+          <div class="st-form-group">
+            <label for="greetingInput">Custom Greeting</label>
+            <input type="text" id="greetingInput" class="st-input"
+                   placeholder="Leave empty for auto (Good morning…)">
+          </div>
+          <div class="st-form-group">
+            <label for="userNameInput">Your Name</label>
+            <input type="text" id="userNameInput" class="st-input"
+                   placeholder="Displayed after the greeting">
+          </div>
+          <div class="st-form-group">
+            <label>Theme</label>
+            <div class="st-theme-toggle">
+              <button class="st-theme-btn" data-theme="light" id="themeLightBtn">☀️ Light</button>
+              <button class="st-theme-btn" data-theme="dark"  id="themeDarkBtn">🌙 Dark</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Assistant -->
+        <div class="st-card">
+          <h2 class="st-card-title">AI 助手</h2>
+          <p class="st-info-text">配置任意兼容 OpenAI 接口的 AI 服务。在任意网页中划选文字，即可弹出浮窗进行翻译或解释。</p>
+          <div class="st-form-group">
+            <label for="aiEndpointInput">API 地址（Base URL）</label>
+            <input type="text" id="aiEndpointInput" class="st-input"
+                   placeholder="https://api.openai.com/v1">
+          </div>
+          <div class="st-form-group">
+            <label for="aiApiKeyInput">API 密鑰</label>
+            <div class="st-input-row">
+              <input type="password" id="aiApiKeyInput" class="st-input"
+                     placeholder="sk-..." autocomplete="off">
+              <button class="st-btn st-btn-sm" id="aiApiKeyToggle" type="button">👁</button>
+            </div>
+          </div>
+          <div class="st-form-group">
+            <label for="aiModelInput">模型名称</label>
+            <input type="text" id="aiModelInput" class="st-input" placeholder="gpt-4o-mini">
+          </div>
+          <div class="st-form-group">
+            <label for="aiTargetLangInput">目标语言</label>
+            <input type="text" id="aiTargetLangInput" class="st-input" placeholder="Chinese">
+          </div>
+          <div class="st-form-group">
+            <label for="aiTranslatePromptInput">翻译 Prompt（{text} {lang}）</label>
+            <textarea id="aiTranslatePromptInput" class="st-input st-textarea" rows="3"
+                      placeholder="Translate the following text to {lang}. Output only the translation:&#10;&#10;{text}"></textarea>
+          </div>
+          <div class="st-form-group">
+            <label for="aiExplainPromptInput">解释 Prompt（{text} {lang}）</label>
+            <textarea id="aiExplainPromptInput" class="st-input st-textarea" rows="3"
+                      placeholder="Explain the following text briefly and clearly in {lang}:&#10;&#10;{text}"></textarea>
+          </div>
+          <div class="st-actions">
+            <button class="st-btn" id="aiTestBtn">⚡ 测试连接</button>
+            <span id="aiTestResult" class="st-hint"></span>
+          </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="st-card">
+          <h2 class="st-card-title">Data Management</h2>
+          <div class="st-actions">
+            <button class="st-btn" id="exportBtn">📦 Export Data</button>
+            <button class="st-btn" id="importBtn">📥 Import Data</button>
+            <input type="file" id="importFile" accept=".json" hidden>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="newtab.js"></script>
 </body>
 </html>

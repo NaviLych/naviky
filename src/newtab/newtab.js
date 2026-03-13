@@ -8,7 +8,7 @@
 
 import { db } from '../shared/db.js';
 import { searchAll } from '../shared/search.js';
-import { loadTheme } from '../shared/theme.js';
+import { loadTheme, setTheme } from '../shared/theme.js';
 
 /* ------------------------------------------------------------------ */
 /*  DOM references                                                     */
@@ -58,9 +58,7 @@ async function initGreeting() {
   greetingEl.textContent = text;
 }
 
-greetingEl.addEventListener('click', () => {
-  window.location.href = chrome.runtime.getURL('src/settings/settings.html');
-});
+greetingEl.addEventListener('click', openSettings);
 
 /* ------------------------------------------------------------------ */
 /*  Search                                                             */
@@ -228,6 +226,195 @@ document.addEventListener('click', (e) => {
     renderResults([]);
   }
 });
+
+/* ------------------------------------------------------------------ */
+/*  Settings panel – open / close                                      */
+/* ------------------------------------------------------------------ */
+
+const stOverlay = document.getElementById('stOverlay');
+
+function openSettings() {
+  stOverlay.hidden = false;
+  // Populate fields fresh each time (in case DB changed elsewhere)
+  initSettingsPanel();
+}
+
+function closeSettings() {
+  stOverlay.hidden = true;
+}
+
+document.getElementById('stClose').addEventListener('click', closeSettings);
+
+// Click on the dark overlay background (not on the panel) → close
+stOverlay.addEventListener('click', (e) => {
+  if (e.target === stOverlay) closeSettings();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !stOverlay.hidden) closeSettings();
+});
+
+/* ------------------------------------------------------------------ */
+/*  Settings – Personalization                                         */
+/* ------------------------------------------------------------------ */
+
+async function initPersonalization() {
+  const greeting = (await db.getSetting('greeting')) || '';
+  const userName = (await db.getSetting('userName')) || '';
+  const theme    = (await db.getSetting('theme'))    || 'dark';
+
+  document.getElementById('greetingInput').value = greeting;
+  document.getElementById('userNameInput').value  = userName;
+  updateThemeButtons(theme);
+
+  if (initPersonalization.bound) return;
+  initPersonalization.bound = true;
+
+  document.getElementById('greetingInput').addEventListener(
+    'input',
+    debounce(async (e) => {
+      await db.setSetting('greeting', e.target.value);
+      await initGreeting(); // live-update greeting text
+    }, 400),
+  );
+
+  document.getElementById('userNameInput').addEventListener(
+    'input',
+    debounce(async (e) => {
+      await db.setSetting('userName', e.target.value);
+      await initGreeting();
+    }, 400),
+  );
+
+  document.getElementById('themeLightBtn').addEventListener('click', () => applyThemeUI('light'));
+  document.getElementById('themeDarkBtn').addEventListener('click',  () => applyThemeUI('dark'));
+}
+
+async function applyThemeUI(theme) {
+  await setTheme(theme);
+  updateThemeButtons(theme);
+}
+
+function updateThemeButtons(theme) {
+  document.querySelectorAll('.st-theme-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Settings – AI                                                      */
+/* ------------------------------------------------------------------ */
+
+async function initAISettings() {
+  const fields = [
+    { id: 'aiEndpointInput',        key: 'aiEndpoint'        },
+    { id: 'aiApiKeyInput',          key: 'aiApiKey'          },
+    { id: 'aiModelInput',           key: 'aiModel'           },
+    { id: 'aiTargetLangInput',      key: 'aiTargetLanguage'  },
+    { id: 'aiTranslatePromptInput', key: 'aiTranslatePrompt' },
+    { id: 'aiExplainPromptInput',   key: 'aiExplainPrompt'   },
+  ];
+
+  for (const { id, key } of fields) {
+    const el = document.getElementById(id);
+    if (el) el.value = (await db.getSetting(key)) ?? '';
+  }
+
+  if (initAISettings.bound) return;
+  initAISettings.bound = true;
+
+  for (const { id, key } of fields) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.addEventListener(
+      'input',
+      debounce(async (e) => db.setSetting(key, e.target.value.trim()), 400),
+    );
+  }
+
+  document.getElementById('aiApiKeyToggle').addEventListener('click', () => {
+    const inp = document.getElementById('aiApiKeyInput');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  });
+
+  document.getElementById('aiTestBtn').addEventListener('click', async () => {
+    const resultEl = document.getElementById('aiTestResult');
+    resultEl.textContent = '测试中…';
+    resultEl.style.color = '';
+    try {
+      const res = await chrome.runtime.sendMessage({
+        type: 'AI_QUERY',
+        text: 'Hello',
+        action: 'explain',
+      });
+      if (res?.error) {
+        resultEl.textContent = '✖ ' + res.error;
+        resultEl.style.color = '#f87171';
+      } else {
+        resultEl.textContent = '✓ 连接成功';
+        resultEl.style.color = '#4ade80';
+      }
+    } catch (err) {
+      resultEl.textContent = '✖ ' + err.message;
+      resultEl.style.color = '#f87171';
+    }
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Settings – Data management                                         */
+/* ------------------------------------------------------------------ */
+
+function initDataManagement() {
+  if (initDataManagement.bound) return;
+  initDataManagement.bound = true;
+
+  document.getElementById('exportBtn').addEventListener('click', async () => {
+    try {
+      const data = await db.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `naviky-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Export failed: ' + err.message);
+    }
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (!confirm('This will replace ALL existing data. Continue?')) return;
+      await db.importData(data);
+      await loadTheme();
+      await initSettingsPanel();
+      await initGreeting();
+      alert('Data imported successfully!');
+    } catch (err) {
+      alert('Import failed: ' + err.message);
+    }
+    e.target.value = '';
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Init settings panel (called each time panel opens)                 */
+/* ------------------------------------------------------------------ */
+
+async function initSettingsPanel() {
+  await initPersonalization();
+  await initAISettings();
+  initDataManagement();
+}
 
 /* ------------------------------------------------------------------ */
 /*  Init                                                               */

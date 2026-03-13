@@ -40,7 +40,7 @@ const DEFAULT_SETTINGS = [
   { key: 'aiModel', value: 'gpt-4o-mini' },
   { key: 'aiTargetLanguage', value: 'Chinese' },
   { key: 'aiTranslatePrompt', value: 'Translate the following text to {lang}. Output only the translation, no explanation:\n\n{text}' },
-  { key: 'aiExplainPrompt', value: 'Explain the following text briefly and clearly in the same language as the text:\n\n{text}' },
+  { key: 'aiExplainPrompt', value: 'Explain the following text briefly and clearly in {lang}:\n\n{text}' },
 ];
 
 /* ------------------------------------------------------------------ */

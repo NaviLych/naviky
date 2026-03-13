@@ -195,11 +195,14 @@ async function handleAIQuery(message) {
       .replace('{lang}', targetLang)
       .replace('{text}', message.text);
   } else {
+    const targetLang = (await db.getSetting('aiTargetLanguage')) || 'Chinese';
     const template =
       (await db.getSetting('aiExplainPrompt')) ||
-      'Explain the following text briefly and clearly:\n\n{text}';
+      'Explain the following text briefly and clearly in {lang}:\n\n{text}';
     systemPrompt = 'You are a helpful assistant that explains concepts clearly and concisely.';
-    userPrompt = template.replace('{text}', message.text);
+    userPrompt = template
+      .replace('{lang}', targetLang)
+      .replace('{text}', message.text);
   }
 
   // Normalise base URL: strip trailing slash then append path
