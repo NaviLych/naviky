@@ -72,7 +72,12 @@
           </div>
           <div class="st-form-group">
             <label for="aiModelInput">模型名称</label>
-            <input type="text" id="aiModelInput" class="st-input" placeholder="gpt-4o-mini">
+            <div class="st-input-row">
+              <input type="text" id="aiModelInput" class="st-input"
+                     list="aiModelList" placeholder="gpt-4o-mini" autocomplete="off">
+              <datalist id="aiModelList"></datalist>
+              <button class="st-btn st-btn-sm" id="aiFetchModelsBtn" type="button" title="从 API 获取可用模型">↻</button>
+            </div>
           </div>
           <div class="st-form-group">
             <label for="aiTargetLangInput">目标语言</label>

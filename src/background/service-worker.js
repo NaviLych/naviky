@@ -161,14 +161,55 @@ async function handleMessage(message, sender) {
     case MSG.AI_QUERY:
       return handleAIQuery(message);
 
+    case MSG.AI_FETCH_MODELS:
+      return handleFetchModels();
+
     default:
       return { error: 'Unknown message type: ' + message.type };
   }
 }
 
 /* ------------------------------------------------------------------ */
-/*  AI Query – calls any OpenAI-compatible chat completions endpoint   */
+/*  Fetch available models from /models endpoint                       */
 /* ------------------------------------------------------------------ */
+
+async function handleFetchModels() {
+  const endpoint = await db.getSetting('aiEndpoint');
+  const apiKey   = await db.getSetting('aiApiKey');
+
+  if (!endpoint || !apiKey) {
+    return { error: '请先填写 API 地址和密鑰。' };
+  }
+
+  const apiUrl = endpoint.replace(/\/+$/, '') + '/models';
+
+  let response;
+  try {
+    response = await fetch(apiUrl, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch (networkErr) {
+    return { error: '网络请求失败: ' + networkErr.message };
+  }
+
+  if (!response.ok) {
+    return { error: `API 错误 ${response.status}` };
+  }
+
+  let data;
+  try { data = await response.json(); } catch (e) {
+    return { error: '无法解析响应' };
+  }
+
+  // OpenAI format: { data: [ { id, ... }, ... ] }
+  const models = (data?.data ?? [])
+    .map((m) => m.id)
+    .filter(Boolean)
+    .sort();
+
+  return { models };
+}
+
 
 async function handleAIQuery(message) {
   const endpoint = await db.getSetting('aiEndpoint');

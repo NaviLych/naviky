@@ -337,6 +337,35 @@ async function initAISettings() {
     inp.type = inp.type === 'password' ? 'text' : 'password';
   });
 
+  document.getElementById('aiFetchModelsBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('aiFetchModelsBtn');
+    const resultEl = document.getElementById('aiTestResult');
+    btn.disabled = true;
+    btn.textContent = '…';
+    resultEl.textContent = '获取模型中…';
+    resultEl.style.color = '';
+    try {
+      const res = await chrome.runtime.sendMessage({ type: 'AI_FETCH_MODELS' });
+      if (res?.error) {
+        resultEl.textContent = '✖ ' + res.error;
+        resultEl.style.color = '#f87171';
+      } else {
+        const datalist = document.getElementById('aiModelList');
+        datalist.innerHTML = res.models
+          .map((id) => `<option value="${id}"></option>`)
+          .join('');
+        resultEl.textContent = `✓ 获取到 ${res.models.length} 个模型`;
+        resultEl.style.color = '#4ade80';
+      }
+    } catch (err) {
+      resultEl.textContent = '✖ ' + err.message;
+      resultEl.style.color = '#f87171';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '↻';
+    }
+  });
+
   document.getElementById('aiTestBtn').addEventListener('click', async () => {
     const resultEl = document.getElementById('aiTestResult');
     resultEl.textContent = '测试中…';
