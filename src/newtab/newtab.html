@@ -94,6 +94,12 @@
             <textarea id="aiExplainPromptInput" class="st-input st-textarea" rows="3"
                       placeholder="Explain the following text briefly and clearly in {lang}:&#10;&#10;{text}"></textarea>
           </div>
+          <div class="st-form-group">
+            <label>自定义 Prompt 按钮</label>
+            <p class="st-hint" style="margin-bottom:0.5rem">每个按钮会在划词弹窗中显示，可用 <code style="background:var(--input-bg);padding:0.1rem 0.3rem;border-radius:4px">{text}</code> 占位。</p>
+            <div id="stCustomPromptsContainer"></div>
+            <button class="st-btn st-btn-sm" id="stAddCustomPromptBtn" type="button">+ 添加</button>
+          </div>
           <div class="st-actions">
             <button class="st-btn" id="aiTestBtn">⚡ 测试连接</button>
             <span id="aiTestResult" class="st-hint"></span>

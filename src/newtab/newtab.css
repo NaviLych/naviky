@@ -491,6 +491,33 @@ body {
   color: var(--text-secondary);
 }
 
+/* ── Custom prompt rows -------------------------------------------- */
+.st-custom-prompt-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 0.4rem;
+  align-items: start;
+  margin-bottom: 0.5rem;
+}
+
+.st-custom-prompt-row .st-input {
+  font-size: 0.83rem;
+}
+
+.st-custom-prompt-row .st-textarea {
+  min-height: 52px;
+}
+
+.st-btn-danger {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #f87171;
+}
+
+.st-btn-danger:hover {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: #f87171;
+}
+
 /* ── Settings panel scrollbar -------------------------------------- */
 .st-panel::-webkit-scrollbar { width: 5px; }
 .st-panel::-webkit-scrollbar-track { background: transparent; }
