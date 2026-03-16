@@ -544,12 +544,90 @@ function initDataManagement() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Settings – Custom prompt buttons                                   */
+/* ------------------------------------------------------------------ */
+
+async function initCustomPromptsPanel() {
+  const container = document.getElementById('stCustomPromptsContainer');
+  const addBtn    = document.getElementById('stAddCustomPromptBtn');
+  if (!container || !addBtn) return;
+
+  let prompts = [];
+  try {
+    const raw = (await db.getSetting('aiCustomPrompts')) || '[]';
+    prompts = JSON.parse(raw);
+  } catch (_) {
+    prompts = [];
+  }
+
+  async function save() {
+    await db.setSetting('aiCustomPrompts', JSON.stringify(prompts));
+  }
+
+  function renderRows() {
+    container.innerHTML = '';
+    prompts.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'st-custom-prompt-row';
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.className = 'st-input';
+      nameInput.placeholder = '按钮名称';
+      nameInput.value = p.name;
+      nameInput.addEventListener('input', debounce(() => {
+        prompts[i].name = nameInput.value;
+        save();
+      }, 400));
+
+      const promptInput = document.createElement('textarea');
+      promptInput.className = 'st-input st-textarea';
+      promptInput.rows = 2;
+      promptInput.placeholder = 'Prompt，用 {text} 代表所选文字';
+      promptInput.value = p.prompt;
+      promptInput.addEventListener('input', debounce(() => {
+        prompts[i].prompt = promptInput.value;
+        save();
+      }, 400));
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'st-btn st-btn-sm st-btn-danger';
+      delBtn.textContent = '删除';
+      delBtn.addEventListener('click', () => {
+        prompts.splice(i, 1);
+        save();
+        renderRows();
+      });
+
+      row.appendChild(nameInput);
+      row.appendChild(promptInput);
+      row.appendChild(delBtn);
+      container.appendChild(row);
+    });
+  }
+
+  // Re-register add button only once
+  if (!initCustomPromptsPanel.bound) {
+    initCustomPromptsPanel.bound = true;
+    addBtn.addEventListener('click', () => {
+      prompts.push({ name: '自定义', prompt: '{text}' });
+      save();
+      renderRows();
+    });
+  }
+
+  renderRows();
+}
+
+/* ------------------------------------------------------------------ */
 /*  Init settings panel (called each time panel opens)                 */
 /* ------------------------------------------------------------------ */
 
 async function initSettingsPanel() {
   await initPersonalization();
   await initAISettings();
+  await initCustomPromptsPanel();
   initDataManagement();
 }
 
